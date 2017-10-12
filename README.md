@@ -1,5 +1,5 @@
 # InterpreterForBareBones
-Bare Bones Language:
+Bare Bones Language Syntax:
 Bare Bones is the simple language that Brookshear uses in his book, 'Computer Science: an Overview', to illustrate the power of Turing complete machines and investigate the halting problem.
 Bare Bones has three simple commands for manipulating a variable:
 clear name;
