@@ -1,5 +1,4 @@
 import java.util.*;
-
 import java.io.*;
 class Variable{
 	public String identifier;
@@ -9,13 +8,12 @@ class Variable{
 		this.val = val;
 	}
 }
-
 public class InterpretBareBones{
 	Hashtable<Integer, Variable> variables = new Hashtable<Integer, Variable>();
 	Hashtable<Integer, String> keyWords = new Hashtable<Integer,String>();
 	public void setKeyWords(){
-		String[] k = {"clear","incr","while","not","do","end","0"};
-		for(int i=0;i<7;i++){
+		String[] k = {"clear","incr","while","not","do","end","0","decr"};
+		for(int i=0;i<8;i++){
 			keyWords.put(k[i].hashCode(),k[i]);
 		}
 	}	
@@ -24,9 +22,9 @@ public class InterpretBareBones{
 		variables.put(identifier.hashCode(),newVar);
 	}
 	public String readInputFile(String fileName){
-		String fileSource ;
-		BufferedReader br = new BufferedReader(new FileReader(fileName));
+		String fileSource;
 		try{
+			BufferedReader br = new BufferedReader(new FileReader(fileName));
 			StringBuilder sb = new StringBuilder();
 			String line = br.readLine();
 			while (line != null) {
@@ -34,34 +32,49 @@ public class InterpretBareBones{
 				line = br.readLine();
 			}
 			fileSource = sb.toString();
-		}finally{
 			br.close();
+		}catch (Exception e){
+			System.err.format("Exception occurred trying to read '%s'.", fileName);
+			e.printStackTrace();
+			return null;
 		}
-		
 		return fileSource;
-	}
-	int returnNextEndLinePositionForWhile(int whileLineNum,String[] source){
-		int x = whileLineNum;
-		int c = 0;
-		while(source[x+1].contains("while")){
-			x+=1;
-		}
-		c = x - whileLineNum;
-		x+=1;
-		do{
-			if(source[x].contains("end")){
-				c-=1;
-			}
-			x+=1;
-		}while(c>0);
-		
-		return (x+1);
-		
 	}
 	int findCurrentWhilePosInArray(int currentLineNum,int[][]arr, int length){
 		for(int i=0;i<length;i++){
 			if(arr[i][0]==currentLineNum){
 				return i;
+			}
+		}
+		return (-1);
+	}
+	public int returnEndLineForWhile(int whileLine,String[] source){
+		int whileLines[][]= new int[10][2];
+		int len = 0;
+		int i = whileLine+1;
+		int newWhile;
+		int temp;
+		Boolean isFinish = false;
+		while(!isFinish){
+			newWhile = whileLine;
+			while(!source[i].contains("end")){
+				if(source[i].contains("while")){
+					temp = findCurrentWhilePosInArray(i,whileLines,len);
+					if(temp!=-1){
+						i = whileLines[temp][1];
+					}else{
+						newWhile = i;
+					}
+				}
+				i+=1;
+			}			
+			if(newWhile==whileLine){
+				return i;
+			}else{
+				whileLines[len][0] = newWhile;
+				whileLines[len][1] = i;
+				len+=1;
+				i=0;
 			}
 		}
 		return (-1);
@@ -76,98 +89,110 @@ public class InterpretBareBones{
 	}
 	public void printAllVariables(){
 		Set<Integer> keys = variables.keySet();
-		//Obtaining iterator over set entries
-		Iterator<Integer> itr = keys.iterator();
-		//Displaying Key and value pairs
 		System.out.print("{ ");
-		while (itr.hasNext()){ 
-		   System.out.print(variables.get(itr.next()).identifier + " = " + variables.get(itr.next()).val+ ", " );
-		} 
+		for(Integer key: keys){
+			System.out.print(variables.get(key).identifier + " = " + variables.get(key).val+ ", " );
+		}
 		System.out.print("}");
-		
+		System.out.println("");
+	
 	}
 	public void interpretSourceCode(String fileName){
 		String fileSource = readInputFile(fileName);
 		String sourceLines[] = fileSource.split(";");
+		System.out.println("Interpreting: ");
+		for(int i=0;i<sourceLines.length;i++){
+			System.out.println("Line " + i + ": " + sourceLines[i]);
+		}
 		String nextInstruction; //while, clear, incr, decr
-		//whileIndicator
 		int whileIndicator[][] = new int[10][2]; //lineNumStart,lineNumEnd
-		
 		int whileCount = 0;
 		String foundVariable;
-		int whilePos;
-		
-		
+		int whilePos,redirect;
+		redirect = 0;
 		for(int i=0;i<sourceLines.length;i++){
 			foundVariable = "";
 			nextInstruction = "";
 			String words[] = sourceLines[i].split(" ");
-			
+			System.out.println("");
+			System.out.println("CURRENTLY EXECUTING LINE " + i);
 			//Individual words in line
 			for(int j=0;j<words.length;j++){
-				if(!keyWords.containsValue(words[j])){
-					if(!variables.containsValue(words[j])){
-						addVariable(words[j],0); //store found vaiable
-					}
+				if(!words[j].equals("")){
+					if(keyWords.get(words[j].hashCode())==null){
+						if(variables.get(words[j].hashCode())==null){
+							addVariable(words[j],0); //store found vaiable
+						}
 					foundVariable = words[j];
-				}else if(words[j]=="clear" | words[j]=="incr" | words[j]=="decr" | words[j]=="ends" | words[j]=="while"){
-					nextInstruction = words[j]; //update next instruction
+					}else if(words[j].equals("clear") | words[j].equals("incr") | words[j].equals("decr") | words[j].equals("end") | words[j].equals("while")){
+						nextInstruction = words[j]; //update next instruction
+					}
 				}
 			}
 			Variable foundVar = variables.get(foundVariable.hashCode());
 			switch(nextInstruction){
 					case "clear":
 						foundVar.val = 0;
+						System.out.println("Line " + i + ": Finished executing clear instruction on line " + i );
+						System.out.print("Line " + i + ": Current values of variables: ");
+						printAllVariables();
 						break;
 					case "decr":
 						foundVar.val -=1;
+						System.out.println("Line " + i + ": Finished executing decr instruction on line " + i );
+						System.out.print("Line " + i + ": Current values of variables: ");
+						printAllVariables();
 						break;
 					case "incr":
 						foundVar.val +=1;
+						System.out.println("Line " + i + ": Finished executing incr instruction on line " + i );
+						System.out.print("Line " + i + ": Current values of variables: ");
+						printAllVariables();
 						break;
 					case "while":
-					
+						System.out.println("Line " + i + ": Going to execute while at line " + i);
 						whilePos = findCurrentWhilePosInArray(i,whileIndicator,whileCount+1);
 						if(whilePos==-1){ //first time interpreter sees this while statement so it needs to include it in whileIndicator array
-							//lineNumStart,lineNumEnd
-							
 							whileIndicator[whileCount][0] = i;
-							whileIndicator[whileCount][1] = returnNextEndLinePositionForWhile(i,sourceLines);
+							whileIndicator[whileCount][1] = returnEndLineForWhile(i,sourceLines);
 							whileCount+=1;
-						}
-						
+						}	
 						if(foundVar.val==0){
-							i =  returnNextEndLinePositionForWhile(i,sourceLines) + 1;  //branch statement
-						}						
+							redirect = returnEndLineForWhile(i,sourceLines);
+							System.out.println("Line " + i + ": While condition hasn't been met for " + foundVariable + ": Need to exit while loop and redirect to line " + redirect);
+							System.out.print("Line " + i + ": Current values of variables: ");
+							printAllVariables();
+							i =  redirect ;  //branch statement
+						}else{
+							System.out.println("Line " + i + ": While condition has been met for " + foundVariable );
+							System.out.print("Line " + i + ": Current values of variables: ");
+							printAllVariables();
+						}
 						break;
-					case "ends":
+					case "end":
+						System.out.println("Line " + i + ": Finished executing line " + i );
+						System.out.print("Line " + i + ": Current values of variables: ");
+						printAllVariables();
 						//branch to previous while
-						i = findPreviousWhileLineNumber(i,whileCount,whileIndicator);
-						break;
-			}
-			System.out.println("Finished executing line " + i );
-			System.out.println("Current values of variables: ");
-			printAllVariables();
-			
-			
-			
-			
-			
+						redirect = findPreviousWhileLineNumber(i,whileCount,whileIndicator) -1;
+						System.out.println("Line " + i + ": Reached end of while loop - need to redirect to start of while loop at line " + (redirect+1));
+						i = redirect;
+						break;	
+			}		
+			redirect = i;
 		}
+		System.out.println("Last Line " + redirect + ": Finished stepping through program. ");
+		System.out.print("Last Line " + redirect + ": FINAL VALUE OF VARIABLES: ");
+		printAllVariables();
 	
 	}	
 	public static void main(String[] args){
 		InterpretBareBones myInterpreter = new InterpretBareBones();
 		Toolbox myTB = new Toolbox();
 		System.out.println("Save text file (source code) in the same directory as these files");
-		System.out.println("Enter the file name of the text file (source code e.g. program.txt) ");
+		System.out.println("Enter the name of the text file (e.g. for file program.txt enter program) ");
 		String fileName = myTB.readStringFromCmd();
 		myInterpreter.setKeyWords();
-		myInterpreter.interpretSourceCode(fileName);
+		myInterpreter.interpretSourceCode(fileName+".txt");	
 	}
-		
-		
-	
-	
-
 }
