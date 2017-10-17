@@ -1,7 +1,7 @@
 InterpreterForBareBones by Kimathi Nyota
 ========================================
 
-KEY INFORMATION
+Key Information:
 ---------------
 InterpretBareBones.java -> this refers to java source file for command line based interpreter. 
 
