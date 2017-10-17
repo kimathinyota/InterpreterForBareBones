@@ -1,5 +1,11 @@
 # InterpreterForBareBones by Kimathi Nyota
 
+InterpretBareBones.java -> this refers to java source file for command line based interpreter. 
+
+dist/ this folder contains source code and jar file for GUI interpreter.
+
+
+
 Bare Bones Language Syntax:
 Bare Bones is the simple language that Brookshear uses in his book, 'Computer Science: an Overview', to illustrate the power of Turing complete machines and investigate the halting problem.
 Bare Bones has three simple commands for manipulating a variable:
