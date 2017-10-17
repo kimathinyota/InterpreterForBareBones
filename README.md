@@ -1,4 +1,4 @@
-InterpreterForBareBones by Kimathi Nyota
+Interpreter For Bare Bones by Kimathi Nyota
 ========================================
 
 Key Information:
