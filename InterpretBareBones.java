@@ -208,9 +208,9 @@ public class InterpretBareBones{
 		}
 		interpretSourceCode(fileSource);
 	}
-	int returnOperatorPrecedence(char operator){
-		Char operators[] = {'(',')','*','/','+','-'}
-		int precedence[] = {6,6,4,4,2,2};
+	int returnOperatorPrecedence(String operator){
+		String operators[] = {"*","/","+","-"}
+		int precedence[] = {4,4,2,2};
 		for(i=0;i<operators.length;i++){
 			if(operator==operators[i]){
 				return precedence[i];
@@ -218,25 +218,81 @@ public class InterpretBareBones{
 		}
 		return -1;
 	}
-	bool isOperand(char operator){
-		if(returnOperatorPrecedence(operator)==-1 && operator!=''){
+	bool isOperand(String operator){
+		if(returnOperatorPrecedence(operator)==-1 && operator!=" "){
+			return true;
+		}
+		return false;
+	}
+	bool isParanthesis(String operator){
+		if(operator=="(" | operator==")"){
 			return true;
 		}
 		return false;
 	}
 	
-	string convertFromInfixToPostfix(string line){
+	
+	string convertFromInfixToPostfix(String line){
 		String postfix,infix;
-		Stack<Char>temp = new Stack<Char>();
-		for(int i=0;i<line.length;i++){
-			if(line[i]==''){
-				infix+=line[i];
+		Stack<String>temp = new Stack<String>();
+		String infix[] = line.split(" ");
+		for(int i =0;i<infix.length;i++){
+			if(isOperand(infix[i]){
+				postfix+=(infix[i]+" ");
+			}else if(isParanthesis(infix[i])==false){
+				if(temp.empty() | (returnOperatorPrecedence(temp.peek())<returnOperatorPrecedence(infix[i]))  ){
+					temp.push(infix[i]);
+				}else{
+					while(!temp.empty && temp.peek()!="(" ){
+						postfix+=(temp.pop()+" ");
+					}
+					temp.push(infix[i]);
+					
+				}
+			}else if(infix[i]=="("){
+				temp.push(infix[i])		
+			}else if(infix[i]==")"){
+				while(!temp.empty && temp.peek()!="("){
+					postfix+=(temp.pop()+" ");
+				}
+				temp.pop();
 			}
 		}
-		
+		return postfix;	
 	}
 	
-	int calculatePostfixExpression(string line){
+	int calculatePostfixExpression(String line){
+		Stack<Integer>temp = new Stack<Integer>();
+		String expr[] = line.split(" ");
+		int lastOp,secLastOp;
+		Integer result;
+		for(int i=0;i<expr.length;i++){
+			if(isOperand(expr[i])){
+				temp.push(Integer.parseInt(expr[i]));
+			}else{
+				lastOp = temp.pop();
+				secLastOp = temp.pop();
+				switch(expr[i]){
+					case "*":
+						result = lastOp*secLastOp;
+						temp.push(result);
+						break;
+					case "+":
+						result = lastOp+secLastOp;
+						temp.push(result);
+						break;
+					case "-":
+						result = lastOp-secLastOp;
+						temp.push(result);
+						break;
+					case "/":
+						result = lastOp/secLastOp;
+						temp.push(result);
+						break;
+						
+				}
+		}
+		return temp.pop();
 	
 	}
 	public int returnCalculationValue(string line){
@@ -342,7 +398,20 @@ public class InterpretBareBones{
 						String var = sourceLines[i].split("=")[0];
 						var = var.split(" ")[0];
 						foundVar = variables.get(var.hashCode());
-						foundVar.val = returnCalculationValue(sourceLines[i].split("=")[1]);
+						
+						var = sourceLines[i].split("=")[1]; //right of =
+						String rightExpr;
+						String rightOfEqual[] = var.split(" ");
+						for(int l=0;l<rightOfEqual.length;l++){
+							var = rightOfEqual[l];
+							foundVar = variables.get(var.hashCode());
+							if(foundVar!=null){
+								rightExpr+=String.valueOf(foundVar.val);
+							}else{
+								rightExpr+=var;
+							}
+						} //code above will replace any variables with their actual number equivalent
+						foundVar.val = returnCalculationValue(rightExpr);
 						break;
 					
 						
@@ -362,6 +431,6 @@ public class InterpretBareBones{
 		System.out.println("Save text file (source code) in the same directory as these files");
 		System.out.println("Enter the name of the text file (e.g. for file program.txt enter program) ");
 		String fileName = myTB.readStringFromCmd();
-		myInterpreter.interpretSourceCode(fileName+".txt");	
+		myInterpreter.interpretFile(fileName+".txt");	
 	}
 }
