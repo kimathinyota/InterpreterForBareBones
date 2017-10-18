@@ -208,9 +208,39 @@ public class InterpretBareBones{
 		}
 		interpretSourceCode(fileSource);
 	}
+	int returnOperatorPrecedence(char operator){
+		Char operators[] = {'(',')','*','/','+','-'}
+		int precedence[] = {6,6,4,4,2,2};
+		for(i=0;i<operators.length;i++){
+			if(operator==operators[i]){
+				return precedence[i];
+			}
+		}
+		return -1;
+	}
+	bool isOperand(char operator){
+		if(returnOperatorPrecedence(operator)==-1 && operator!=''){
+			return true;
+		}
+		return false;
+	}
 	
-	public int returnCalculationValue(string line){
+	string convertFromInfixToPostfix(string line){
+		String postfix,infix;
+		Stack<Char>temp = new Stack<Char>();
+		for(int i=0;i<line.length;i++){
+			if(line[i]==''){
+				infix+=line[i];
+			}
+		}
 		
+	}
+	
+	int calculatePostfixExpression(string line){
+	
+	}
+	public int returnCalculationValue(string line){
+		return calculatePostfixExpression(convertFromInfixToPostfix(line));	
 	}
 		
 	public void interpretSourceCode(String fileSource, int startLine=0){
