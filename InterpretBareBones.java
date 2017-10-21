@@ -47,30 +47,104 @@ class Subroutine{
 	
 	
 	
+class Variable{ //this will store a variable in the program e.g. for variable x = 3 : identifier = X and val = 3 
+	public String identifier;
+	public int val;
+	public Variable(String identifier, int val){
+		this.identifier = identifier;
+		this.val = val;
+	}
+}
+class Subroutine{
+	public String identifier;
+	public int startLineNum,endLineNum;
+	ArrayList<Variable> parameters = new ArrayList<Variable>();
+	public String trimSourceCode(String source[],int start, int end){
+		String trimArr = new String();
+		for(int i=start;i<end+1;i++){
+			trimArr+=source[i];
+		}
+		return trimArr;
+	}
+			
+	public int routineCall(ArrayList<Integer>arguments, String source[]){
+		InterpretBareBones interpretRoutine = new InterpretBareBones();
+		for(int i=0;i<parameters.size();i++){
+			if(i<arguments.size()){
+				parameters.get(i).val = arguments.get(i);
+                        }else{
+				parameters.get(i).val = 0;
+			}
+			interpretRoutine.addVariable(parameters.get(i));
+		}
+		return interpretRoutine.interpretSourceCode(trimSourceCode(source,startLineNum,endLineNum),startLineNum+1);
+                
+	}
+	
+	public Subroutine(String id, int start, int end, ArrayList<Variable>param){
+		identifier = id;
+		startLineNum = start;
+		endLineNum = end;
+		parameters = param;
+	}
+	
+	
+	
+}	
+	
+	
+	
+	
 public class InterpretBareBones{
 	//Hash tables have an average look up of O(1) so searching for an element in a hash table is much quicker than using an array
 	Hashtable<Integer, Variable> variables = new Hashtable<Integer, Variable>(); /*as the number of variables increases, the look up
 	time for each variable stays constant */
 	Hashtable<Integer, String> keyWords = new Hashtable<Integer, String>(); //don't have to write a for loop to search array
-	Hashtable<Integer, Subroutine> routines = new Hashtable<Integer, Subroutine>();
-	
+	Hashtable<Integer, Subroutine> routines = new Hashtable<Integer, Subroutine>();	
 	public String getRoutineID(String line){
-		String declareSub[] = source[start].split(" ");
+		String declareSub[] = line.split(" ");
 		String id = declareSub[1];
 		id = id.split("(")[0];
+                id = id.split(" ")[0];
 		return id;
 		
-	}
-	
-	public String[] getRoutineParameters(String line){
+	}	
+	public Integer[] getRoutineParameters(String line){
 		String splitBracket[] = line.split("(");
 		String insideBracket = splitBracket[1];
-		insideBracket = insideBracket.substring(0,insideBracket.length-2);
+		insideBracket = insideBracket.substring(0,insideBracket.length()-2);
+		String param[] = insideBracket.split(",");
+                Integer paramValues[] = new Integer[param.length];
+                Variable foundVar;
+                int count = 0;
+                String expr = new String();
+                for(int i=0;i<param.length;i++){
+                    String currentExpression[] = param[i].split(" ");
+                    for(int j=0;j<currentExpression.length;j++){
+                        expr = "";
+                        String currentToken[] = currentExpression[i].split(" ");
+                        for(int k=0;k<currentToken.length;k++){
+                            foundVar = variables.get(currentToken[k].hashCode());
+                            if(foundVar!=null){
+                                    expr+=String.valueOf(foundVar.val);
+                            }else{
+                                    expr+=currentToken[j]+" ";
+                            }
+                        }         
+                        paramValues[count] = returnCalculationValue(expr);
+                        count+=1;        
+                    }
+                }
+		return paramValues;
+	}	
+	public String[] getDeclaredRoutineParameters(String line){
+		String splitBracket[] = line.split("(");
+		String insideBracket = splitBracket[1];
+		insideBracket = insideBracket.substring(0,insideBracket.length()-2);
 		String param[] = insideBracket.split(",");
 		return param;
 	}
-	
-	public void addRoutine(String source[],int start){
+        public void addRoutine(String source[],int start){
 		int i = start;
 		while(!source[i+1].equals("endsub")){
 			i+=1;
@@ -79,7 +153,7 @@ public class InterpretBareBones{
 		//find identifier
 		String id = getRoutineID(source[start]);
 		//find parameters
-		String param[] = getRoutineParameters(source[start]);
+		String param[] = getDeclaredRoutineParameters(source[start]);
 		ArrayList<Variable>parameters = new ArrayList<Variable>();
 		for(int j=0;j<param.length;j++){
 			Variable temp = new Variable(param[j].split(" ")[0],0);
@@ -88,20 +162,13 @@ public class InterpretBareBones{
 		Subroutine newSub = new Subroutine(id,start,end,parameters);
 		routines.put(id.hashCode(),newSub);
 	}	
-	public addSubroutines(String source[]){
-		String routine;
-		int start;
+	public void addSubroutines(String source[]){
 		for(int i=0;i<source.length;i++){
 			if(source[i].contains("sub")){
 				addRoutine(source,i);
 			}
 		}	
 	}
-		
-		
-		
-	
-	
 	public void setKeyWords(){
 		String[] k = {"clear","incr","while","not","do","end","0","decr"};
 		for(int i=0;i<8;i++){
@@ -195,9 +262,7 @@ public class InterpretBareBones{
 		System.out.print("}");
 		System.out.println("");
 	
-	}
-		
-		
+	}	
 	public void interpretFile(String fileName){
 		String fileSource = readInputFile(fileName);
 		String sourceLines[] = fileSource.split(";");
@@ -206,61 +271,58 @@ public class InterpretBareBones{
 		for(int i=0;i<sourceLines.length;i++){
 			System.out.println("Line " + i + ": " + sourceLines[i]);
 		}
-		interpretSourceCode(fileSource);
+		interpretSourceCode(fileSource,0);
 	}
 	int returnOperatorPrecedence(String operator){
-		String operators[] = {"*","/","+","-"}
+		String operators[] = {"*","/","+","-"};
 		int precedence[] = {4,4,2,2};
-		for(i=0;i<operators.length;i++){
+		for(int i=0;i<operators.length;i++){
 			if(operator==operators[i]){
 				return precedence[i];
 			}
 		}
 		return -1;
 	}
-	bool isOperand(String operator){
+	Boolean isOperand(String operator){
 		if(returnOperatorPrecedence(operator)==-1 && operator!=" "){
 			return true;
 		}
 		return false;
 	}
-	bool isParanthesis(String operator){
+	Boolean isParanthesis(String operator){
 		if(operator=="(" | operator==")"){
 			return true;
 		}
 		return false;
-	}
-	
-	
-	string convertFromInfixToPostfix(String line){
-		String postfix,infix;
+	}	
+	String convertFromInfixToPostfix(String line){
+		String postfix = new String();
 		Stack<String>temp = new Stack<String>();
 		String infix[] = line.split(" ");
 		for(int i =0;i<infix.length;i++){
-			if(isOperand(infix[i]){
+			if(isOperand(infix[i])){
 				postfix+=(infix[i]+" ");
 			}else if(isParanthesis(infix[i])==false){
 				if(temp.empty() | (returnOperatorPrecedence(temp.peek())<returnOperatorPrecedence(infix[i]))  ){
 					temp.push(infix[i]);
 				}else{
-					while(!temp.empty && temp.peek()!="(" ){
+					while(!temp.empty() && temp.peek()!="(" ){
 						postfix+=(temp.pop()+" ");
 					}
 					temp.push(infix[i]);
 					
 				}
 			}else if(infix[i]=="("){
-				temp.push(infix[i])		
+				temp.push(infix[i]);		
 			}else if(infix[i]==")"){
-				while(!temp.empty && temp.peek()!="("){
+				while(!temp.empty() && temp.peek()!="("){
 					postfix+=(temp.pop()+" ");
 				}
 				temp.pop();
 			}
 		}
 		return postfix;	
-	}
-	
+	}	
 	int calculatePostfixExpression(String line){
 		Stack<Integer>temp = new Stack<Integer>();
 		String expr[] = line.split(" ");
@@ -291,15 +353,39 @@ public class InterpretBareBones{
 						break;
 						
 				}
+                        }
 		}
 		return temp.pop();
 	
 	}
-	public int returnCalculationValue(string line){
+        public int returnCalculationValue(String line){
 		return calculatePostfixExpression(convertFromInfixToPostfix(line));	
 	}
-		
-	public void interpretSourceCode(String fileSource, int startLine=0){
+	public String returnFormattedRightOfString(String input, String operator, String[] source){ //returns the right side of the input from the operator and replaces any function call or variable with the value
+            //Check for function call: 
+            String var = input.split(operator)[1];
+            String rightExpr = new String();
+            String rightOfEqual[] = var.split(" ");
+            Variable foundVar;
+            String functionCall;
+            Subroutine foundSub;
+            for(int l=0;l<rightOfEqual.length;l++){
+                    var = rightOfEqual[l];
+                    functionCall = getRoutineID(var);
+                    foundSub = routines.get(functionCall.hashCode());
+                    foundVar = variables.get(var.hashCode());
+                    if(foundVar!=null){
+                            rightExpr+=String.valueOf(foundVar.val);
+                    }else if(foundSub!=null){
+                            rightExpr+=var;
+                    }else{
+                         ArrayList<Integer>param = new ArrayList<Integer>(Arrays.asList(getRoutineParameters(var)));
+                         rightExpr += foundSub.routineCall(param, source);
+                    }
+            } //code above will replace any variables with their actual number equivalent
+            return rightExpr;
+        }
+	public int interpretSourceCode(String fileSource, int startLine){
 		setKeyWords();
 		String sourceLines[] = fileSource.split(";"); //split source code into an array consisting of individual lines
 		addSubroutines(sourceLines);
@@ -326,17 +412,12 @@ public class InterpretBareBones{
 						}
 						foundVariable = words[j]; 
 					}else if(words[j].equals("clear") | words[j].equals("incr") | words[j].equals("decr") 
-						 | words[j].equals("end") | words[j].equals("while") | words[j].equals("sub") | words[j].equals("=")){
+						 | words[j].equals("end") | words[j].equals("while") | words[j].equals("sub") | words[j].equals("=") | words[j].equals("return")){
 						nextInstruction = words[j]; //update next instruction
 						
-					}else if(words[j].contains("//"){
+					}else if(words[j].charAt(0)=='/' && words[j].charAt(1)=='/'){
 						break;
 					}
-					
-
-						
-						
-					
 				}
 			}
 			Variable foundVar = variables.get(foundVariable.hashCode()); //foundVar references variable found in the current line
@@ -395,36 +476,32 @@ public class InterpretBareBones{
 						break;
 					case "=":
 						//find variable to left of =
-						String var = sourceLines[i].split("=")[0];
-						var = var.split(" ")[0];
-						foundVar = variables.get(var.hashCode());
-						
-						var = sourceLines[i].split("=")[1]; //right of =
-						String rightExpr;
-						String rightOfEqual[] = var.split(" ");
-						for(int l=0;l<rightOfEqual.length;l++){
-							var = rightOfEqual[l];
-							foundVar = variables.get(var.hashCode());
-							if(foundVar!=null){
-								rightExpr+=String.valueOf(foundVar.val);
-							}else{
-								rightExpr+=var;
-							}
-						} //code above will replace any variables with their actual number equivalent
-						foundVar.val = returnCalculationValue(rightExpr);
+						String leftVariable = sourceLines[i].split("=")[0];
+						leftVariable = leftVariable.split(" ")[0];
+						foundVar = variables.get(leftVariable.hashCode());
+						foundVar.val = returnCalculationValue(returnFormattedRightOfString(sourceLines[i],"=",sourceLines));
 						break;
-					
-						
-						
-						
+                                        case "return":
+                                            return returnCalculationValue(returnFormattedRightOfString(sourceLines[i],"return",sourceLines));    
 			}		
 			redirect = i;
 		}
 		System.out.println("Last Line " + redirect + ": Finished stepping through program. ");
 		System.out.print("Last Line " + redirect + ": FINAL VALUE OF VARIABLES: ");
 		printAllVariables();
+                return 0;
 	
-	}	
+	}		
+        public static void main(String[] args){
+		InterpretBareBones myInterpreter = new InterpretBareBones();
+		Toolbox myTB = new Toolbox();
+		System.out.println("Save text file (source code) in the same directory as these files");
+		System.out.println("Enter the name of the text file (e.g. for file program.txt enter program) ");
+		String fileName = myTB.readStringFromCmd();
+		myInterpreter.interpretFile(fileName+".txt");	
+	}
+}
+
 	public static void main(String[] args){
 		InterpretBareBones myInterpreter = new InterpretBareBones();
 		Toolbox myTB = new Toolbox();
