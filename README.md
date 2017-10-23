@@ -35,7 +35,17 @@ Example programs:
 -----------------
 Program 1: Adding 5 and 7 : 
 
-sub add(x,y); clear z; z = x + y; return z; endsub; clear x; clear y; x = 5; y = 7; clear z; z = add(x,y);
+sub add(x,y); 
+   clear z; 
+   z = x + y; 
+   return z; 
+endsub; 
+clear x; 
+clear y; 
+x = 5; 
+y = 7; 
+clear z; 
+z = add(x,y);
 
 Program 2: Returning difference between 2 input numbers : 
 
