@@ -62,19 +62,19 @@ Program 2: Returning difference between 2 input numbers :
 
 sub difference(x,y); 
 
-   if y > x;  
+     if y > x;  
 
-      return ( y - x ); 
+           return ( y - x ); 
 
-   endif; 
+     endif; 
 
-   if x > y; 
+     if x > y; 
 
-      return ( x - y ); 
+           return ( x - y ); 
 
-   endif;  
+     endif;  
 
-   return 0; 
+     return 0; 
 
 endsub; 
 
