@@ -37,11 +37,11 @@ Program 1: Adding 5 and 7 :
 
 sub add(x,y); 
 
-   clear z; 
+     clear z; 
    
-   z = x + y; 
+     z = x + y; 
    
-   return z; 
+     return z; 
    
 endsub; 
 
@@ -60,12 +60,48 @@ z = add(x,y);
 
 Program 2: Returning difference between 2 input numbers : 
 
-sub difference(x,y); if y > x;  return ( y - x ); endif; if x > y;  return ( x - y ); endif;  return 0; endsub; clear y;
-y = difference(2,3); clear h; h = difference(3,8); clear p; p = difference(4,4); clear o; o = difference(10,2);
+sub difference(x,y); 
+
+   if y > x;  
+
+      return ( y - x ); 
+
+   endif; 
+
+   if x > y; 
+
+      return ( x - y ); 
+
+   endif;  
+
+   return 0; 
+
+endsub; 
+
+clear y;
+
+y = difference(2,3); 
+
+clear h; 
+
+h = difference(3,8); 
+
+clear p; 
+
+p = difference(4,4); 
+
 
 Program 3: Returning square of input number : 
 
-sub square(x); return x * x; endsub; clear z; z = square(5);
+sub square(x); 
+
+     return x * x; 
+
+endsub; 
+
+clear z; 
+
+z = square(5);
 
 
 Challenge specifications:
