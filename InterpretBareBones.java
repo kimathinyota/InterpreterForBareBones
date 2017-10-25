@@ -64,47 +64,13 @@ public class InterpretBareBones{
                 Integer paramValues[] = new Integer[param.length];
                 Variable foundVar;
                 int count = 0;
-                String expr = new String();
-                /*
                 for(int i=0;i<param.length;i++){
-                    String currentExpression[] = param[i].trim().split("\\s+");
-                    System.out.println("Parameter: "+ param[i]);
-                    for(int j=0;j<currentExpression.length;j++){
-                        System.out.println("Current expression: "+ currentExpression[j]);
-                        expr = "";
-                        String currentToken[] = currentExpression[j].trim().split("\\s+");
-                        for(int k=0;k<currentToken.length;k++){
-                            System.out.println("Current expression: "+ currentToken[k]);
-                            foundVar = variables.get(currentToken[k].hashCode());
-                            if(foundVar!=null){
-                                    expr+=foundVar.val;
-                            }else{
-                                    expr+=currentToken[j]+" ";
-                            }
-                        }
-                        paramValues[count] = returnCalculationValue(expr);
-                        count+=1;        
+                    foundVar = variables.get(param[i].hashCode());
+                    if(foundVar!=null){
+                        paramValues[count] = foundVar.val;
+                    }else{
+                        paramValues[count] = Integer.valueOf(param[i]);
                     }
-                }
-                */
-                
-                  for(int i=0;i<param.length;i++){
-                    String currentExpression[] = param[i].trim().split("\\s+");
-                    System.out.println("Parameter: "+ param[i]);
-                    expr = "";
-                    for(int j=0;j<currentExpression.length;j++){
-                        System.out.println("Current expression: "+ currentExpression[j]);
-                        foundVar = variables.get(currentExpression[j].hashCode());
-                            if(foundVar!=null){
-                                expr+=foundVar.val;
-                            }else{
-                                expr+=currentExpression[j];
-                            }
-                            expr += " ";
-                    }
-                    expr = expr.substring(0,expr.length()-1);
-                    System.out.println("Post fix expression: "+ expr);
-                    paramValues[count] = returnCalculationValue(expr);
                     count+=1; 
                 }
 		return paramValues;
@@ -403,6 +369,7 @@ public class InterpretBareBones{
 	public Boolean isNumeric(String s) { 
             return s != null && s.matches("[-+]?\\d*\\.?\\d+");  
         }  
+    
         public String returnFormattedRightOfString(String input, String operator, String[] source){ //returns the right side of the input from the operator and replaces any function call or variable with the value
             //Check for function call: 
             String var = input.trim().split(operator)[1];
@@ -420,8 +387,6 @@ public class InterpretBareBones{
                     }
                     foundVar = variables.get(rightOfEqual[l].hashCode());
                     if(!rightOfEqual[l].equals(" ")){
-                        System.out.println("Trying |"+rightOfEqual[l]+"|");
-                     
                         if(foundVar!=null){
                             rightExpr+=foundVar.val;
                         }else if(foundSub==null){
@@ -431,9 +396,7 @@ public class InterpretBareBones{
                             }else{
                                 rightExpr+=Integer.valueOf(rightOfEqual[l]);
                             }
-                            
                         }else{
-                            System.out.println("Found routine");
                             ArrayList<Integer>param = new ArrayList<Integer>(Arrays.asList(getRoutineParameters(rightOfEqual[l])));
                             rightExpr += foundSub.routineCall(param, source);
                         }
@@ -458,8 +421,6 @@ public class InterpretBareBones{
 		int whilePos,redirect,ifPos,value;
                 String condition,currentSub,postfix;
 		redirect = 0;
-		
-                System.out.println("Starting at start line " + startLine + " - alrighty man lets get started");
 		for(int i=startLine;i<sourceLines.length;i++){ //iterate through array of individual lines of source code
 			foundVariable = "";
 			nextInstruction = "";
@@ -510,8 +471,8 @@ public class InterpretBareBones{
 						System.out.println("Line " + i + ": Going to execute while at line " + i);
                                                 whilePos = findCurrentXPosInArray(i,whileIndicator);
 						if(whilePos==-1){ //first time interpreter sees this while statement so it needs to include it in whileIndicator array
-							whileIndicator[ifCount][0] = i; 
-							whileIndicator[ifCount][1] = returnEndLineForX(i,sourceLines,"while");
+							whileIndicator[whileCount][0] = i; 
+							whileIndicator[whileCount][1] = returnEndLineForX(i,sourceLines,"while");
 							whileCount+=1;
 						}
 						//CHECK WHILE CONDITIONS
