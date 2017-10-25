@@ -29,8 +29,8 @@ class Subroutine{
 			}
 			interpretRoutine.addVariable(parameters.get(i));
 		}
-                System.out.println("");
-		return interpretRoutine.interpretSourceCode(trimSourceCode(source,startLineNum,endLineNum),startLineNum+1);           
+                System.out.println();
+		return interpretRoutine.interpretSourceCode(trimSourceCode(source,0,endLineNum),startLineNum+1);           
 	}	
 	public Subroutine(String id, int start, int end, ArrayList<Variable>param){
 		identifier = id;
@@ -65,23 +65,47 @@ public class InterpretBareBones{
                 Variable foundVar;
                 int count = 0;
                 String expr = new String();
+                /*
                 for(int i=0;i<param.length;i++){
                     String currentExpression[] = param[i].trim().split("\\s+");
+                    System.out.println("Parameter: "+ param[i]);
                     for(int j=0;j<currentExpression.length;j++){
+                        System.out.println("Current expression: "+ currentExpression[j]);
                         expr = "";
                         String currentToken[] = currentExpression[j].trim().split("\\s+");
                         for(int k=0;k<currentToken.length;k++){
+                            System.out.println("Current expression: "+ currentToken[k]);
                             foundVar = variables.get(currentToken[k].hashCode());
                             if(foundVar!=null){
-                                    expr+=String.valueOf(foundVar.val);
+                                    expr+=foundVar.val;
                             }else{
                                     expr+=currentToken[j]+" ";
                             }
                         }
-                        expr = expr.substring(0,expr.length()-1);
                         paramValues[count] = returnCalculationValue(expr);
                         count+=1;        
                     }
+                }
+                */
+                
+                  for(int i=0;i<param.length;i++){
+                    String currentExpression[] = param[i].trim().split("\\s+");
+                    System.out.println("Parameter: "+ param[i]);
+                    expr = "";
+                    for(int j=0;j<currentExpression.length;j++){
+                        System.out.println("Current expression: "+ currentExpression[j]);
+                        foundVar = variables.get(currentExpression[j].hashCode());
+                            if(foundVar!=null){
+                                expr+=foundVar.val;
+                            }else{
+                                expr+=currentExpression[j];
+                            }
+                            expr += " ";
+                    }
+                    expr = expr.substring(0,expr.length()-1);
+                    System.out.println("Post fix expression: "+ expr);
+                    paramValues[count] = returnCalculationValue(expr);
+                    count+=1; 
                 }
 		return paramValues;
 	}	
@@ -253,7 +277,7 @@ public class InterpretBareBones{
 		}
 		return false;
 	}	
-	String convertFromInfixToPostfix(String line){
+        String convertFromInfixToPostfix(String line){
 		String postfix = new String();
 		Stack<String>temp = new Stack<String>();
 		String infix[] = line.trim().split("\\s+");
@@ -269,23 +293,23 @@ public class InterpretBareBones{
 					while(!temp.empty() && !temp.peek().equals("(")){
 						postfix+=(temp.pop()+" ");
 					}
+                                        if(!temp.empty()) temp.pop();
 					temp.push(infix[i]);
-					
 				}
-			}else if(infix[i]=="("){
-				temp.push(infix[i]);		
-			}else if(infix[i]==")"){
+			}else if(infix[i].equals("(")){
+				temp.push(infix[i]);
+			}else if(infix[i].equals(")")){
 				while(!temp.empty() && !temp.peek().equals("(")){
 					postfix+=(temp.pop()+" ");
 				}
-				temp.pop();
+				if(!temp.empty()) temp.pop();
 			}
 		}
                 while(!temp.empty() && !temp.peek().equals("(")){
                     postfix+=(temp.pop()+" ");
 		}
-                postfix = postfix.substring(0,postfix.length()-1);
-					
+                if(!temp.empty()) temp.pop();
+                postfix = postfix.substring(0,postfix.length()-1);	
 		return postfix;	
 	}	
 	int calculatePostfixExpression(String line){
@@ -323,8 +347,6 @@ public class InterpretBareBones{
 	
 	}
         public Integer returnCalculationValue(String line){
-                System.out.println("POST FIX: "+ convertFromInfixToPostfix(line));
-                System.out.println("VALUE: " + calculatePostfixExpression(convertFromInfixToPostfix(line)));
 		return calculatePostfixExpression(convertFromInfixToPostfix(line));	
 	}
         String returnComparativeOperator(String line){
@@ -378,26 +400,40 @@ public class InterpretBareBones{
             }
                 return false;     
         }
-	public String returnFormattedRightOfString(String input, String operator, String[] source){ //returns the right side of the input from the operator and replaces any function call or variable with the value
+	public Boolean isNumeric(String s) { 
+            return s != null && s.matches("[-+]?\\d*\\.?\\d+");  
+        }  
+        public String returnFormattedRightOfString(String input, String operator, String[] source){ //returns the right side of the input from the operator and replaces any function call or variable with the value
             //Check for function call: 
             String var = input.trim().split(operator)[1];
             String rightExpr = new String();
-            String rightOfEqual[] = var.trim().split("\\s+");
+            String rightOfEqual[] = var.trim().split(" ");
             Variable foundVar;
             String functionCall = null;
             Subroutine foundSub = null;
             for(int l=0;l<rightOfEqual.length;l++){
+                    foundSub = null;
+                    functionCall = null;
                     if(rightOfEqual[l].length()>1){
                         functionCall = getRoutineID(rightOfEqual[l]);
                         foundSub = routines.get(functionCall.hashCode());
                     }
                     foundVar = variables.get(rightOfEqual[l].hashCode());
                     if(!rightOfEqual[l].equals(" ")){
+                        System.out.println("Trying |"+rightOfEqual[l]+"|");
+                     
                         if(foundVar!=null){
-                            rightExpr+=String.valueOf(foundVar.val);
+                            rightExpr+=foundVar.val;
                         }else if(foundSub==null){
-                            rightExpr+=rightOfEqual[l];
+                            
+                            if(!isOperand(rightOfEqual[l])){
+                                rightExpr+=rightOfEqual[l];
+                            }else{
+                                rightExpr+=Integer.valueOf(rightOfEqual[l]);
+                            }
+                            
                         }else{
+                            System.out.println("Found routine");
                             ArrayList<Integer>param = new ArrayList<Integer>(Arrays.asList(getRoutineParameters(rightOfEqual[l])));
                             rightExpr += foundSub.routineCall(param, source);
                         }
@@ -407,6 +443,7 @@ public class InterpretBareBones{
             rightExpr = rightExpr.substring(0,rightExpr.length()-1);
             return rightExpr;
         }
+       
 	public int interpretSourceCode(String fileSource, int startLine){
 		setKeyWords();
 		String sourceLines[] = fileSource.split(";"); //split source code into an array consisting of individual lines
@@ -416,12 +453,13 @@ public class InterpretBareBones{
 		and q refers to line number of accompanying end */
                 int ifIndicator[][] = new int[10][2]; 
                 int ifCount = 0;
-		int whileCount = 0;
+                int whileCount = 0;
 		String foundVariable; 
-		int whilePos,redirect,ifPos;
-                String condition;
+		int whilePos,redirect,ifPos,value;
+                String condition,currentSub,postfix;
 		redirect = 0;
-		String currentSub;
+		
+                System.out.println("Starting at start line " + startLine + " - alrighty man lets get started");
 		for(int i=startLine;i<sourceLines.length;i++){ //iterate through array of individual lines of source code
 			foundVariable = "";
 			nextInstruction = "";
@@ -431,7 +469,7 @@ public class InterpretBareBones{
 			//Individual words in line
 			for(int j=0;j<words.length;j++){ //iterate through array of individual words within current line
 				if(!words[j].equals("")){ // <==> current word needs to not be empty
-					if(keyWords.get(words[j].hashCode())==null && isParameter(words[j])==false){ //indicates that current word isn't a keyword so must be a variable
+					if(keyWords.get(words[j].hashCode())==null && isParameter(words[j])==false && isNumeric(words[j])==false ){ //indicates that current word isn't a keyword so must be a variable
                                                 if(variables.get(words[j].hashCode())==null){ //indicates that current variable hasn't been stored yet
 							addVariable(words[j],0); //store found vaiable
 						}
@@ -540,12 +578,15 @@ public class InterpretBareBones{
                                             System.out.println("Line " + i + ": Going to return value ("+returnValue+") for current routine: ");
                                             return returnValue;
 					case "=":
-                                                System.out.println("Line " + i +": Need to process = statement");
+                                                System.out.println("Line " + i +": Need to process " + sourceLines[i].trim() + " statement ");
 						//find variable to left of =
 						String leftVariable = sourceLines[i]; //.split("\\s+")[0];
 						leftVariable = leftVariable.trim().split("=")[0].trim();
 						foundVar = variables.get(leftVariable.hashCode());
-                                                Integer value = returnCalculationValue(returnFormattedRightOfString(sourceLines[i],"=",sourceLines));
+                                                
+                                                
+                                                value = returnCalculationValue(returnFormattedRightOfString(sourceLines[i],"=",sourceLines));
+                                                System.out.println("Line " + i +": Finished " + leftVariable + " = " + returnFormattedRightOfString(sourceLines[i],"=",sourceLines) + " = " + value);
 						foundVar.val = value;
 						break;
                                         
@@ -564,6 +605,7 @@ public class InterpretBareBones{
 		System.out.println("Save text file (source code) in the same directory as these files");
 		System.out.println("Enter the name of the text file (e.g. for file program.txt enter program) ");
 		String fileName = myTB.readStringFromCmd();
-		myInterpreter.interpretFile(fileName+".txt");	
+		myInterpreter.interpretFile(fileName+".txt");
+              
 	}
 }
