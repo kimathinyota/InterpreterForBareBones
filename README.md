@@ -24,14 +24,17 @@ Note that variables need not be declared before they are used and must be non-ne
 KEBB Syntax:
 -----------------
 DECLARING VARIABLES
+
 Syntax [clear variableName;] (declares an integer variable called variableName with a value of 0)
 
 
 ADDING COMMENTS: 
+
 Syntax [ // add comment ; ] - Use // to add a comment and DON'T FORGET TO ADD SEMICOLON AT THE END OF EACH COMMENT 
 
 
 CONDITION STATEMENTS: statement that involves a comparison between two values. 
+
 Syntax [ var operator val; ] 
 
 var = variable, val = mathematical expression,
@@ -40,20 +43,25 @@ Operator (comparitive) :  == (equal), != (not equal) , >= , <=, >, <, not 0 (spe
 
 
 Selection:  IF STATEMENTS
+
 Syntax [if condition; ... ; endif; ]  
 
 
 Iteration: WHILE LOOPS
+
 Syntax [while condition; ... ; endwhile; ] 
 
 
-Subroutines: 
+SUBROUTINES:
+
 DECLARATION SYNTAX [sub name(x,y,...); ... ; endsub; ] 
 
 There can't be any space between routine name and parameter brackets. 
+
 Only need return statements for function declarations 
 
 RETURN STATEMENT
+
 Syntax [return val;], where val = mathematical expression.
 
 CALLING FUNCTION SYNTAX [var = routineName(parameters)], where routineName is a function
