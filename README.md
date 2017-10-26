@@ -23,28 +23,38 @@ Note that variables need not be declared before they are used and must be non-ne
 
 KEBB Syntax:
 -----------------
-declaring variable: Syntax [ clear variableName; ] (declares an integer variable called variableName with a value of 0)
+DECLARING VARIABLES
+Syntax [clear variableName;] (declares an integer variable called variableName with a value of 0)
 
-adding comments: Use // to add a comment Syntax [ // add comment ; ] - DON'T FORGET TO ADD SEMICOLON AT THE END OF EACH COMMENT
+ADDING COMMENTS: 
+Syntax [ // add comment ; ] - Use // to add a comment and DON'T FORGET TO ADD SEMICOLON AT THE END OF EACH COMMENT 
 
-condition - statement that involves a comparison between two values. 
+CONDITION STATEMENTS: statement that involves a comparison between two values. 
 Syntax [ var operator val; ] 
-(var = variable, val = integer value derrived from mathematical expression, and operator (including == (check if two integers are equal) , != (not equal) , >= , <=, >, <, not 0 (special case where val = 0) )
+var = variable, val = mathematical expression, 
+Operator (comparitive) :  == (equal), != (not equal) , >= , <=, >, <, not 0 (special case where val = 0) 
 
-Selection: Syntax [if condition; ... ; endif; ]  (... - represents other code that will be written )
 
-Iteration: Syntax [while condition; ... ; endwhile; ] 
+Selection:  IF STATEMENTS
+Syntax [if condition; ... ; endif; ]  
 
-Subroutines: Declaration Syntax [sub name(x,y,...); ... ; endsub; ] - for a routine to be declared there can't be any space between routine name and parameter brackets. 
-For function declarations you need to add a return statement syntax [return val;], where val = mathematical expression.
+Iteration: WHILE LOOPS
+Syntax [while condition; ... ; endwhile; ] 
+
+Subroutines: 
+DECLARATION SYNTAX [sub name(x,y,...); ... ; endsub; ] 
+For a routine to be declared there can't be any space between routine name and parameter brackets. 
+For function declarations you need to add a return statement 
+Syntax [return val;], where val = mathematical expression.
 For procedure declarations you shouldn't add a return statement.
-Calling subroutines: Typical way of calling routines - var = routineName(parameters). This is due to the fact that parameters are passed by value and are encapsulated within the subroutine that they are declared in so it is best to declare functions instead of procedures.
+CALLING FUNCTION SYNTAX [var = routineName(parameters)], where routineName is a function
+CALLING PROCEDUCRE SYNTAX [routineName(parameters);], where routineName is a procedure
 
 
-Mathematical expressions (val) : consists of variables, numbers, operators and brackets such that val = integer e.g 3 * ( a * 4 ) or x + y. Syntax: There must be a space between each operator (*, -, +, /) , operand (variable or number), and bracket, and each opening bracket must have an accompanying closing bracket.
+Mathematical expressions (val) : consists of variables, numbers, operators and brackets such that val = integer 
+Syntax: There must be a space between each operator (*, -, +, /) , operand (variable or number), and bracket 
+and each opening bracket must have an accompanying closing bracket.
 Valid examples: val = 2 * x * y; , val = ( 2 * ( 4 * 5 * b ) + 4 ) / 3;
-
-
 
 
 Example programs:
