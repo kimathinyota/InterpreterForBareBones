@@ -26,34 +26,46 @@ KEBB Syntax:
 DECLARING VARIABLES
 Syntax [clear variableName;] (declares an integer variable called variableName with a value of 0)
 
+
 ADDING COMMENTS: 
 Syntax [ // add comment ; ] - Use // to add a comment and DON'T FORGET TO ADD SEMICOLON AT THE END OF EACH COMMENT 
 
+
 CONDITION STATEMENTS: statement that involves a comparison between two values. 
 Syntax [ var operator val; ] 
-var = variable, val = mathematical expression, 
+
+var = variable, val = mathematical expression,
+
 Operator (comparitive) :  == (equal), != (not equal) , >= , <=, >, <, not 0 (special case where val = 0) 
 
 
 Selection:  IF STATEMENTS
 Syntax [if condition; ... ; endif; ]  
 
+
 Iteration: WHILE LOOPS
 Syntax [while condition; ... ; endwhile; ] 
 
+
 Subroutines: 
 DECLARATION SYNTAX [sub name(x,y,...); ... ; endsub; ] 
-For a routine to be declared there can't be any space between routine name and parameter brackets. 
-For function declarations you need to add a return statement 
+
+There can't be any space between routine name and parameter brackets. 
+Only need return statements for function declarations 
+
+RETURN STATEMENT
 Syntax [return val;], where val = mathematical expression.
-For procedure declarations you shouldn't add a return statement.
+
 CALLING FUNCTION SYNTAX [var = routineName(parameters)], where routineName is a function
+
 CALLING PROCEDUCRE SYNTAX [routineName(parameters);], where routineName is a procedure
 
 
-Mathematical expressions (val) : consists of variables, numbers, operators and brackets such that val = integer 
+Mathematical expressions (val) : collection of variables, numbers, operators and brackets such that val = integer 
+
 Syntax: There must be a space between each operator (*, -, +, /) , operand (variable or number), and bracket 
 and each opening bracket must have an accompanying closing bracket.
+
 Valid examples: val = 2 * x * y; , val = ( 2 * ( 4 * 5 * b ) + 4 ) / 3;
 
 
