@@ -9,6 +9,8 @@ InterpretBareBones.java -> this refers to java source file for command line base
 
 dist/ this folder contains source code and jar file for GUI interpreter.
 
+Save GUI KEBB Interpreter in a specific folder on your drive and have a go at writing KEBB code
+
 Bare Bones Language Syntax:
 ---------------------------
 
@@ -23,17 +25,17 @@ Note that variables need not be declared before they are used and must be non-ne
 
 KEBB Syntax:
 -----------------
-DECLARING VARIABLES
+Declaring Variables
 
 Syntax [clear variableName;] (declares an integer variable called variableName with a value of 0)
 
 
-ADDING COMMENTS: 
+Comments
 
 Syntax [ // add comment ; ] - Use // to add a comment and DON'T FORGET TO ADD SEMICOLON AT THE END OF EACH COMMENT 
 
 
-CONDITION STATEMENTS: statement that involves a comparison between two values. 
+Conditional Statements: statement that involves a comparison between two values. 
 
 Syntax [ var operator val; ] 
 
@@ -42,31 +44,31 @@ var = variable, val = mathematical expression,
 Operator (comparitive) :  == (equal), != (not equal) , >= , <=, >, <, not 0 (special case where val = 0) 
 
 
-Selection:  IF STATEMENTS
+Selection:  IF Statements
 
 Syntax [if condition; ... ; endif; ]  
 
 
-Iteration: WHILE LOOPS
+Iteration: While loops
 
 Syntax [while condition; ... ; endwhile; ] 
 
 
-SUBROUTINES:
+Subroutines
 
-DECLARATION SYNTAX [sub name(x,y,...); ... ; endsub; ] 
+Declaration Syntax [sub name(x,y,...); ... ; endsub; ] 
 
 There can't be any space between routine name and parameter brackets. 
 
 Only need return statements for function declarations 
 
-RETURN STATEMENT
+Return Statement
 
 Syntax [return val;], where val = mathematical expression.
 
-CALLING FUNCTION SYNTAX [var = routineName(parameters)], where routineName is a function
+Calling Function Syntax [var = routineName(parameters)], where routineName is a function
 
-CALLING PROCEDUCRE SYNTAX [routineName(parameters);], where routineName is a procedure
+Calling Procedure Syntax [routineName(parameters);], where routineName is a procedure
 
 
 Mathematical expressions (val) : collection of variables, numbers, operators and brackets such that val = integer 
