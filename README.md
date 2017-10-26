@@ -1,8 +1,10 @@
-Interpreter For Bare Bones by Kimathi Nyota
+KEBB Interpreter by Kimathi Nyota
 ========================================
 
 Key Information:
----------------
+-----------------
+KEBB (Kimathi's Extended Bare Bones) : This is a simple integer-only programming language that is based upon Bare Bones.
+
 InterpretBareBones.java -> this refers to java source file for command line based interpreter. 
 
 dist/ this folder contains source code and jar file for GUI interpreter.
@@ -19,89 +21,91 @@ while name not 0 do; ... endwhile; ... where name is a variable.
 
 Note that variables need not be declared before they are used and must be non-negative integers. Statements are delimited by the ; character.
 
-Added Features:
+KEBB Syntax:
 -----------------
-while condition; code; endwhile;
-if condition; code; endif;
-EXAMPLES: condition could equal var > integer or var == integer
+declaring variable: Syntax [ clear variableName; ] (declares an integer variable called variableName with a value of 0)
 
-OPERATORS: == (check if two integers are equal), != (not equal), >=, <=, >, <, = (set var = some integer), -, +, *, /
+adding comments: Use // to add a comment Syntax [ // add comment ; ] - DON'T FORGET TO ADD SEMICOLON AT THE END OF EACH COMMENT
 
-sub routine(var1,var2,var3,..); code; endsub; ==> this is a subroutine
+condition - statement that involves a comparison between two values. 
+Syntax [ var operator val; ] 
+(var = variable, val = integer value derrived from mathematical expression, and operator (including == (check if two integers are equal) , != (not equal) , >= , <=, >, <, not 0 (special case where val = 0) )
 
-return value ==> use this within a subroutine to return a value
+Selection: Syntax [if condition; ... ; endif; ]  (... - represents other code that will be written )
+
+Iteration: Syntax [while condition; ... ; endwhile; ] 
+
+Subroutines: Declaration Syntax [sub name(x,y,...); ... ; endsub; ] - for a routine to be declared there can't be any space between routine name and parameter brackets. 
+For function declarations you need to add a return statement syntax [return val;], where val = mathematical expression.
+For procedure declarations you shouldn't add a return statement.
+Calling subroutines: Typical way of calling routines - var = routineName(parameters). This is due to the fact that parameters are passed by value and are encapsulated within the subroutine that they are declared in so it is best to declare functions instead of procedures.
+
+
+Mathematical expressions (val) : consists of variables, numbers, operators and brackets such that val = integer e.g 3 * ( a * 4 ) or x + y. Syntax: There must be a space between each operator (*, -, +, /) , operand (variable or number), and bracket, and each opening bracket must have an accompanying closing bracket.
+Valid examples: val = 2 * x * y; , val = ( 2 * ( 4 * 5 * b ) + 4 ) / 3;
+
+
+
 
 Example programs:
 -----------------
 Program 1: Adding 5 and 7 : 
 
-sub add(x,y); 
-
-     clear z; 
-   
-     z = x + y; 
-   
-     return z; 
-   
-endsub; 
-
-clear x; 
-
-clear y; 
-
-x = 5;
-
-y = 7;
-
-clear z; 
-
-z = add(x,y);
-
-
+    sub add(x,y); 
+        return x + y;    
+    endsub; 
+    clear z; 
+    z = add(3,4);
+    //above code sets z = 3 + 4 = 7;
+    
 Program 2: Returning difference between 2 input numbers : 
 
-sub difference(x,y); 
-
-     if y > x;  
-
-           return ( y - x ); 
-
-     endif; 
-
-     if x > y; 
-
-           return ( x - y ); 
-
-     endif;  
-
-     return 0; 
-
-endsub; 
-
-clear y;
-
-y = difference(2,3); 
-
-clear h; 
-
-h = difference(3,8); 
-
-clear p; 
-
-p = difference(4,4); 
+    sub difference(x,y); 
+        if y > x;  
+            return ( y - x ); 
+        endif; 
+        if x > y; 
+            return ( x - y ); 
+        endif;  
+        return 0; 
+    endsub; 
+    clear y;
+    y = difference(2,3); //y = 1;
+    clear h; 
+    h = difference(3,8); // h = 5;
+    clear p; 
+    p = difference(4,4); //p = 0;
 
 
-Program 3: Returning square of input number : 
+Program 3: Returning exponent given base and power : 
 
-sub square(x); 
+    sub exponent(x,power); // returns x ^ power;
+        clear z;
+        z = power;
+        clear tot;
+        tot = 1;
+        while z > 0;
+            tot = tot * x;
+            z = z - 1;
+        endwhile;
+        return tot;
+    endsub;
+    clear z;
+    z = exponent(2,3); //z = 2^ 3 = 8;
+    
+Program 4: Recursive approach to calculate factorial
 
-     return x * x; 
-
-endsub; 
-
-clear z; 
-
-z = square(5);
+    sub factorial(x);
+        if x == 1; //terminating statement
+            return 1;
+            endif;
+        clear z;
+        z = x - 1;
+        return x * factorial(z); // recursive call
+    endsub;
+    clear z;
+    z = factorial(3);  //z = 3 * 2 * 1 = 6
+   
 
 
 Challenge specifications:
